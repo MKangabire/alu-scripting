@@ -7,7 +7,7 @@ Reddit API to retrieve the number of subscribers
 for a given subreddit.
 
 """
-if __main__ = "__main__":
+if __main__ == "__main__":
     import json
     import requests
 
@@ -34,4 +34,3 @@ if __main__ = "__main__":
             return 0
         else:
             return res_json["data"]["subscribers"]
-
