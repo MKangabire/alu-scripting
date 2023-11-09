@@ -31,3 +31,6 @@ def top_ten(subreddit):
 
     else:
         print'(None')
+
+if __main__ == "__main__":
+    pass
