@@ -13,12 +13,21 @@ def top_ten(subreddit):
     """
     URL = "https://www.reddit.com/r/{}/top.json".format(subreddit)
 
+    params = {
+            "t": "all",
+            "count": 0,
+            "limit": 10
+    }
+
     headers = {"User-Agent": "0-subs/2.0"}
 
-    response = requests.get(URL, headers=headers)
+    response = requests.get(URL, params=params, headers=headers)
 
     if response.status_code == 200:
-        sys.stdout.write("OK")
+        resp_json = response.json()
+        resp_children = resp_json["data"]["children"]
+        for post in resp_children:
+            print(post["data"]["title"])
 
     else:
-        print("error")
+        print(None)
