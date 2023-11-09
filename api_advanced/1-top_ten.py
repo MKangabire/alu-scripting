@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """
-a function that queries the Reddit API and prints
-the titles of the first 10 hot posts listed for a given subreddit.
+a function print the titles of the first 10 hot posts listed for a given subreddit.
 """
 
 import json
@@ -20,8 +19,7 @@ def top_ten(subreddit):
     if (response.status_code) == 200:
         json_response = response.json()
 
-        sorted_posts = sorted(json_response['data']['children'],\
-                key=lambda x: x['data']['score'], reverse=True)
+        sorted_posts = sorted(json_response['data']['children'], key=lambda x: x['data']['score'], reverse=True)
 
         for post in sorted_posts[:10]:
             title = post['data']['title']
