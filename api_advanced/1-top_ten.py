@@ -17,13 +17,7 @@ def top_ten(subreddit):
     response = requests.get(URL, headers=headers)
 
     if (response.status_code) == 200:
-        json_response = response.json()
+        print("OK")
 
-        sorted_posts = sorted(json_response['data']['children'], key=lambda x: x['data']['score'], reverse=True)
-
-        for post in sorted_posts[:10]:
-            title = post['data']['title']
-            print(title)
-i
-        else:
-            print("error")
+    else:
+        print("error")
