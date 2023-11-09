@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-a function print the titles of the first 10 hot posts listed for a given subreddit.
+prints OK if ran successful.
 """
 
 import json
@@ -17,7 +17,7 @@ def top_ten(subreddit):
 
     response = requests.get(URL, headers=headers)
 
-    if (response.status_code) == 200:
+    if response.status_code == 200:
         sys.stdout.write("OK")
 
     else:
