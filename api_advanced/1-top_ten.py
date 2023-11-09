@@ -7,6 +7,7 @@ import json
 import requests
 import sys
 
+
 def top_ten(subreddit):
     """
     prints the titles of the first 10 hot posts
@@ -25,10 +26,8 @@ def top_ten(subreddit):
 
     if response.status_code == 200:
         resp_json = response.json()
-        resp_children = resp_json["data"]['top_ten']
-        return resp_children
-        
-
+        resp_children = resp_json['data']['top_ten']
+        return resp_children 
 
     else:
-        print(None)
+        print'(None')
