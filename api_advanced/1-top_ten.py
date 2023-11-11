@@ -28,7 +28,7 @@ def top_ten(subreddit):
         return titles
 
     else:
-        print('None')
+        return
 
 if __name__ == '__main__':
     pass
