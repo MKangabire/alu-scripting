@@ -7,10 +7,10 @@ If no results are found for the given subreddit,
 the function should return None.
 """
 import json
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
-import time
 
 
 def recurse(subreddit, hot_list=[]):
