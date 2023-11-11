@@ -1,54 +1,30 @@
 #!/usr/bin/python3
-"""
-Write a recursive function that queries the Reddit API
-and returns a list containing the titles of all hot
-articles for a given subreddit.
-If no results are found for the given subreddit,
-the function should return None.
-"""
-import json
-import time
-import urllib.error
-import urllib.parse
-import urllib.request
+'''Defines recursive function to return hot posts in subreddit
+'''
+import requests
 
 
-def recurse(subreddit, hot_list=[]):
-    list_len = len(hot_list)
-    limit = list_len + 1
-    query = {"limit": limit - 1}
-    query = urllib.parse.urlencode(query)
-    url = f"https://www.reddit.com/r/{subreddit}/hot/.json?{query}"
-    req_object = urllib.request.Request(url, method="GET")
-    req_object.add_header('User-Agent', 'OboloScript/3.0')
-    try:
-        with urllib.request.urlopen(req_object) as resp_object:
-            resp_json = json.load(resp_object)
-    except urllib.error.HTTPError:
+def recurse(subreddit, hot_list=[], fullname=None, count=0):
+    '''fetches all hot posts in a subreddit
+
+    Return:
+        None - if subreddit is invalid
+    '''
+    url = 'https://www.reddit.com/r/{}/hot/.json'.format(subreddit)
+    params = {'after': fullname, 'limit': 100, 'count': count}
+    headers = {'user-agent': 'Mozilla/5.0 \
+(Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'}
+    info = requests.get(url, headers=headers,
+                        params=params, allow_redirects=False)
+    if (info.status_code % 400) < 100:
         return None
-    else:
-        resp_children = resp_json["data"]["children"]
-        try:
-            _ = resp_children[limit - 1]["data"]["title"]
-        except IndexError:
-            return hot_list
-        else:
-            if len(resp_children) == 2:
-                hot_list.append(resp_children[limit - 1]["data"]["title"])
-                hot_list.append(resp_children[limit]["data"]["title"])
-                """
-                or this below
-                final_list.append(0)
-                final_list.append(1)
-                hot_list += "0"
-                hot_list += "1"
-                """
-            else:
-                hot_list.append(resp_children[limit - 1]["data"]["title"])
-                """
-                or this below
-                final_list.append(2)
-                hot_list += "2"
-                """
-                time.sleep(5)
-            return recurse(subreddit, hot_list)
+    info_json = info.json()
+    results = info_json.get('data').get('children')
+    new_packet = [post.get('data').get('title') for post in results]
+    hot_list += new_packet
+    after = info_json.get('data').get('after', None)
+    dist = info_json.get('data').get('dist')
+    count += dist
+    if after:
+        recurse(subreddit, hot_list, after, count)
+    return hot_list
