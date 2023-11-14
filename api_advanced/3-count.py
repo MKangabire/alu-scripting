@@ -1,44 +1,56 @@
 #!/usr/bin/python3
-'''a recursive function that queries the Reddit API,
- parses the title of all hot articles, and prints a
- sorted count of given keywords
-'''
+"""
+recursive funtion that
+parses the titles of all hot posts
+and prints out a sorted count of given words
+"""
+
+
+import json
 import requests
+import sys
 
 
-def count_words(subreddit, word_list, fullname="", count=0, hash_table={}):
-    '''fetches all hot posts in a subreddit
-    Return:
-        None - if subreddit is invalid
-    '''
-    if subreddit is None or not isinstance(subreddit, str) or \
-       word_list is None or word_list == []:
+def count_words(subreddit, word_list, after=None, results=None):
+    """
+    recursive function
+    """
+    if results is None:
+        results = {}
+
+    url = 'https://www.reddit.com/r/{}/hot.json'.format(subreddit)
+    params = {'limit': 10, 'after': after} if after else {'limit': 10}
+    headers = {
+            "User-Agent": "3-count/1.0"
+    }
+
+    response = requests.get(url, params=params, headers=headers)
+
+    if response.status_code != 200:
+        print(f"Error: HTTP Status Code {response.status_code}")
         return
-    url = 'https://www.reddit.com/r/{}/hot/.json'.format(subreddit)
-    params = {'after': fullname, 'count': count}
-    headers = {'user-agent': 'Mozilla/5.0 \
-(Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'}
-    info = requests.get(url, headers=headers,
-                        params=params, allow_redirects=False)
-    if info.status_code != 200:
-        return None
-    info_json = info.json()
-    results = info_json.get('data').get('children')
-    new_packet = [post.get('data').get('title') for post in results]
-    for title in new_packet:
-        for word in word_list:
-            word = word.lower()
-            formatted_title = title.lower().split(" ")
-            if word in formatted_title:
-                if (word in hash_table.keys()):
-                    hash_table[word] += formatted_title.count(word)
-                else:
-                    hash_table[word] = formatted_title.count(word)
-    after = info_json.get('data').get('after', None)
-    dist = info_json.get('data').get('dist')
-    count += dist
-    if after:
-        count_words(subreddit, word_list, after, count, hash_table)
+
+    data = response.json()
+
+    if 'data' in data and 'children' in data['data']:
+        for child in data['data']['children']:
+            title_words = child['data']['title'].lower().split()
+
+            for word in word_list:
+                if word.lower() in title_words:
+                    results[word.lower()] = results.get(word.lower(), 0) + title_words.count(word.lower())
+
+        count_words(subreddit, word_list, after=data['data'].get('after'), results=results)
+
+       
     else:
-        {print('{}: {}'.format(key, value)) for
-         key, value in sorted(hash_table.items(), key=lambda i: (-i[1], i[0]))}
+        print("Error: Unexpected response format")
+
+                                                                                                                                                                                if results:
+        sorted_results = sorted(results.items(), key=lambda x: (-x[1], x[0]))
+        for word, count in sorted_results:
+            print(f"{word}: {count}")
+
+
+if __name__ == '__main__':
+    pass
